@@ -157,7 +157,6 @@ MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, 
 
 /*Generating the CPU usage */
 CPU_OCCUPY *generateCPUUsage(CPU_OCCUPY **CPU_array, int i){
-    printf("----------------------------------------------------\n");
     printf("Number of cores: %ld\n", sysconf(_SC_NPROCESSORS_ONLN)); // get the number of core
     CPU_OCCUPY *cpu = malloc(sizeof(CPU_OCCUPY)); //creat a new CPU data type
     cpu = newCpu();
@@ -187,18 +186,16 @@ bool changeArgument(int argc, char**argv, int *sample, int *interval, bool *syst
     
     
     if(argc > 1){
-        char *p;
         int i = 1;
         while(i < argc){
-            char *flag =                                           (argv[i], "=", &p);//read the command line
+            char *flag = strtok(argv[i], "=");//read the command line
             if(strcmp(flag, "--sample") == 0){
-                *sample = atoi(__strtok_r(NULL, "", &p));//change the sample value
+                *sample = atoi(strtok(NULL, ""));//change the sample value
                 sample_chose = true;
             }else if(strcmp(flag, "--tdelay") == 0){
-                *interval = atoi(__strtok_r(NULL, "", &p));//change the time delay value
+                *interval = atoi(strtok(NULL, ""));//change the time delay value
                 interval_chose = true;
-            }else if (strcmp(flag, "--system") == 0)
-            {
+            }else if (strcmp(flag, "--system") == 0){
                 *system_chose = true;
             }else if (strcmp(flag, "--user") == 0){
                 *user_chose = true;
@@ -244,8 +241,7 @@ void getUserUsage(){
         
         ut = getutent();
     }
-
-    
+    printf("----------------------------------------------------\n");
 }
 
 
@@ -312,7 +308,7 @@ void printSystemStats(int sample, int inerval, bool system_chose, bool graph_cho
     int i = 0;
     while(i <  sample){
         
-        printf("\x1b%d", 7); //save the position
+        printf("\x1b[s"); //save the position
 
         if (system_chose && !graph_chose) { // if system flag indicated without graphics
             MEMORY_array[i] = generateMemoryUsage(MEMORY_array, i, sample);
@@ -334,20 +330,25 @@ void printSystemStats(int sample, int inerval, bool system_chose, bool graph_cho
 
         if (i+1 < sample) { 
             sleep(inerval); //the interval to read relavant data
-            printf("\x1b%d", 8);//back to the position
+            printf("\x1b[u");//back to the position
         }
         i++;
     }
 
+    printSystemInfo();// print the system information
+
     //free the memory space
-    for(int j = 0; j < sample + 1; j++){
-        free(CPU_array[j]);
+    
+    if(!(user_chose && !system_chose && !graph_chose)){
+        for(int j = 0; j < sample + 1; j++){
+            free(CPU_array[j]);
     }
-    for(int j = 0; j < sample; j++){
-        free(MEMORY_array[j]);
+        for(int j = 0; j < sample; j++){
+            free(MEMORY_array[j]);
+    }
     }
 
-    printSystemInfo();// print the system information
+    
 
 }
 
@@ -393,12 +394,16 @@ void printSystemStatsSequence(int sample, int inerval, bool system_chose, bool g
         i++;
     }
 
-    for(int j = 0; j < sample + 1; j++){
-        free(CPU_array[j]);
+    if(!(user_chose && !system_chose && !graph_chose)){
+        for(int j = 0; j < sample + 1; j++){
+            free(CPU_array[j]);
     }
-    for(int j = 0; j < sample; j++){
-        free(MEMORY_array[j]);
+        for(int j = 0; j < sample; j++){
+            free(MEMORY_array[j]);
     }
+    }
+
+    
 
     printSystemInfo();
 }
