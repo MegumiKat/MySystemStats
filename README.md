@@ -77,6 +77,7 @@ To ensure that the output is refreshed at every time point, before taking each s
 | `void printSystemStatsSequence(int sample, int inerval, bool system_chose, bool graph_chose, bool user_chose, bool sequential_chose)` | Prints final output. `sample` is the number times statistics will be collected and `interval` is the frequency of statistic collection.`system_chose`, `user_chose`, `graph_chose` and `sequential_chose` hold true iff the `system` chose, `user` chose, `graphics` and 'sequential` chose are inputted by the user, respectively. |
 
 
+### Running the Program
 
 
 
