@@ -241,7 +241,7 @@ void getUserUsage(){
         
         ut = getutent();
     }
-    printf("----------------------------------------------------\n");
+    
 }
 
 
@@ -317,6 +317,7 @@ void printSystemStats(int sample, int inerval, bool system_chose, bool graph_cho
         if (!system_chose && !user_chose && !graph_chose) { //if no command inputed
             MEMORY_array[i] = generateMemoryUsage(MEMORY_array, i, sample);
             getUserUsage();
+            printf("----------------------------------------------------\n");
             CPU_array[i+1] = generateCPUUsage(CPU_array, i);
             
         }
