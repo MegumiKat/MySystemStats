@@ -13,6 +13,7 @@
 
 /*Define a cpu_occupy struct*/
 typedef struct CPU_PACKAGE{
+    char str[1024];
     unsigned int total_usage;//store the total usage
     unsigned int idle;//store the idle 
 }CPU_OCCUPY;
@@ -58,7 +59,7 @@ MEMORY_OCCUPY* newMemory(){
     memory->virtual_mem_used = virtual_mem_used;//set the memory value
     memory->total_ram = total_ram;//set the memory value
 
-    sprintf(memory->str, "%.2f GB / %.2f GB -- %.2f GB / %.2f GB\n", memory->phys_mem_used, memory->total_ram, memory->virtual_mem_used, memory->total_memory);//set the memory value
+    sprintf(memory->str, "%.2f GB / %.2f GB -- %.2f GB / %.2f GB", memory->phys_mem_used, memory->total_ram, memory->virtual_mem_used, memory->total_memory);//set the memory value
 
     return memory;
 }
@@ -97,6 +98,7 @@ CPU_OCCUPY *newCpu(){
 
     cpu->total_usage = user + nice + system + idle + iowait + irq + softirq + steal + guest;//calculate the total usage
     cpu->idle = idle;//set the idle
+    strcpy(cpu->str, "");
 
     return cpu;
 }
@@ -105,7 +107,7 @@ CPU_OCCUPY *newCpu(){
 float calculateCPUUsage(CPU_OCCUPY *cpuinfo_1, CPU_OCCUPY *cpuinfo_2){
     float cpu_usage;
     if(cpuinfo_1 == NULL){//if it is the first time to get data
-        cpu_usage = 0;
+        cpu_usage = 100 - cpuinfo_2->idle * 100.0 / cpuinfo_2->total_usage;
     }else{//calcualte the cpu usage in percentage
          cpu_usage = 100 - (cpuinfo_2->idle - cpuinfo_1->idle) * 100.0 / (cpuinfo_2->total_usage - cpuinfo_1->total_usage);
     }
@@ -120,22 +122,73 @@ void printMemoryUsage(){
     printf("----------------------------------------------------\n");
 }
 
-/*Generating the Memory Usage */
-MEMORY_OCCUPY *generateMemoryUsage(MEMORY_OCCUPY **MEMORY_array, int i, int sample){
+/*Generating the Memory Usage with graphics */
+MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample){
     printMemoryUsage();// print the memory usage
     printf("### Memory ### (Phys.Used/Tot -- Virtual Used/Tot)\n");
     MEMORY_OCCUPY *memory = malloc(sizeof(MEMORY_OCCUPY));// create a new memory data type
     memory = newMemory();
     for(int j = 0; j < i; j++){//print all elements in the MEMORY_array
-        printf("%s",MEMORY_array[j]->str);
+        printf("%s\n",MEMORY_array[j]->str);
     }
-    printf("%s", memory->str);//print the data read in this time
+
+    strcat(memory->str, "        | ");
+    if(i == 0){
+        strcat(memory->str, "o ");
+    }else{
+        float last_phys = MEMORY_array[i -1]->phys_mem_used;
+        float curr_phys = memory->phys_mem_used;
+
+        float delta_memory_usage = curr_phys - last_phys;
+        char relevant_stat[80];
+
+        // zero+
+        if (delta_memory_usage == 0) {
+            strcat(memory->str, "o ");
+        }
+        // positive change in memory usage
+        else if (delta_memory_usage > 0) {
+            for (float i = 0; i < delta_memory_usage; i += 0.0105) {
+                strcat(memory->str, "#");
+            }
+            strcat(memory->str, "* ");
+        }
+        // negative change in memory usage
+        else if (delta_memory_usage < 0) {
+            for (float i = 0; i < delta_memory_usage; i += 0.0105) {
+                strcat(memory->str, ":");
+            }
+            strcat(memory->str, "@ ");
+        }
+        sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
+        strcat(memory->str, relevant_stat);
+    }
+
+    printf("%s\n", memory->str);//print the data read in this time
+
     for (int j = 0; j < sample - i - 1; j++){// change the column
         printf("\n");
     }
     return memory;
 
 }
+
+MEMORY_OCCUPY *generateMemoryUsage(MEMORY_OCCUPY **MEMORY_array, int i, int sample){
+    printMemoryUsage();// print the memory usage
+    printf("### Memory ### (Phys.Used/Tot -- Virtual Used/Tot)\n");
+    MEMORY_OCCUPY *memory = malloc(sizeof(MEMORY_OCCUPY));// create a new memory data type
+    memory = newMemory();
+    for(int j = 0; j < i; j++){//print all elements in the MEMORY_array
+        printf("%s\n",MEMORY_array[j]->str);
+    }
+    printf("%s\n", memory->str);//print the data read in this time
+    for (int j = 0; j < sample - i - 1; j++){// change the column
+        printf("\n");
+    }
+    return memory;
+
+}
+
 
 /*Generating the Memory Usage if "--sequence" command*/
 MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, int sample){
@@ -145,14 +198,87 @@ MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, 
     memory = newMemory();
     for(int j = 0; j < i; j++){
         strcpy(MEMORY_array[j]->str, "\n");
-        printf("%s",MEMORY_array[j]->str);
+        printf("%s\n",MEMORY_array[j]->str);
     }
-    printf("%s", memory->str);
+    printf("%s\n", memory->str);
     for (int j = 0; j < sample - i - 1; j++){
         printf("\n");
     }
     return memory;
 
+}
+/*Generating the Memory Usage if "--sequence" command with graphics*/
+MEMORY_OCCUPY *generateMemoryUsageSequenceGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample){
+    printMemoryUsage();
+    printf("### Memory ### (Phys.Used/Tot -- Virtual Used/Tot)\n");
+    MEMORY_OCCUPY *memory = malloc(sizeof(MEMORY_OCCUPY));
+    memory = newMemory();
+    for(int j = 0; j < i; j++){
+        strcpy(MEMORY_array[j]->str, "\n");
+        printf("%s\n",MEMORY_array[j]->str);
+    }
+
+    strcat(memory->str, "        | ");
+    if(i == 0){
+        strcat(memory->str, "o ");
+    }else{
+        float last_phys = MEMORY_array[i -1]->phys_mem_used;
+        float curr_phys = memory->phys_mem_used;
+
+        float delta_memory_usage = curr_phys - last_phys;
+        char relevant_stat[80];
+
+        // zero+
+        if (delta_memory_usage == 0) {
+            strcat(memory->str, "o ");
+        }
+        // positive change in memory usage
+        else if (delta_memory_usage > 0) {
+            for (float i = 0; i < delta_memory_usage; i += 0.010001) {
+                strcat(memory->str, "#");
+            }
+            strcat(memory->str, "* ");
+        }
+        // negative change in memory usage
+        else if (delta_memory_usage < 0) {
+            for (float i = 0; i < delta_memory_usage; i += 0.010001) {
+                strcat(memory->str, ":");
+            }
+            strcat(memory->str, "@ ");
+        }
+        sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
+        strcat(memory->str, relevant_stat);
+    }
+
+    printf("%s\n", memory->str);
+    for (int j = 0; j < sample - i - 1; j++){
+        printf("\n");
+    }
+    return memory;
+
+}
+
+/*Generating the CPU usage with graphics */
+CPU_OCCUPY *generateCPUUsageGraphics(CPU_OCCUPY **CPU_array, int i){
+    printf("Number of cores: %ld\n", sysconf(_SC_NPROCESSORS_ONLN)); // get the number of core
+    CPU_OCCUPY *cpu = malloc(sizeof(CPU_OCCUPY)); //creat a new CPU data type
+    cpu = newCpu();
+    float cpu_usage = calculateCPUUsage(CPU_array[i], cpu);//get the cpu usage value
+    printf(" total cpu use = %.2f%%\n", cpu_usage); // display CPU usage
+    strcat(cpu->str, "          |||");
+    char relevant[80];
+    for(int i = 0; i < cpu_usage; i++){
+        strcat(cpu->str,"|");
+    }
+    sprintf(relevant, " %.2f", cpu_usage);
+    strcat(cpu->str, relevant);
+    for(int j = 1; j < (i + 1); j++){
+        printf("%s\n", CPU_array[j]->str);   
+    }
+    printf("%s\n", cpu->str);
+    
+
+    return cpu;
 }
 
 /*Generating the CPU usage */
@@ -324,10 +450,16 @@ void printSystemStats(int sample, int inerval, bool system_chose, bool graph_cho
         if (user_chose) { 
             getUserUsage();
         }
-
-
-
-
+        if (system_chose && graph_chose) { // if system and graphics flag indicated
+            MEMORY_array[i] = generateMemoryUsageGraphics(MEMORY_array, i, sample);
+            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
+        }
+        if (!system_chose && !user_chose && graph_chose) { // if no flag indicated except graphics
+            MEMORY_array[i] = generateMemoryUsageGraphics(MEMORY_array, i, sample);
+            getUserUsage();
+            printf("----------------------------------------------------\n");
+            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
+        }
 
         if (i+1 < sample) { 
             sleep(inerval); //the interval to read relavant data
@@ -378,11 +510,22 @@ void printSystemStatsSequence(int sample, int inerval, bool system_chose, bool g
         if (!system_chose && !user_chose && !graph_chose) { 
             MEMORY_array[i] = generateMemoryUsageSequence(MEMORY_array, i, sample);
             getUserUsage();
+            printf("----------------------------------------------------\n");
             CPU_array[i+1] = generateCPUUsage(CPU_array, i);
             
         }
         if (user_chose) { 
             getUserUsage();
+        }
+        if (system_chose && graph_chose) { // if system and graphics flag indicated
+            MEMORY_array[i] = generateMemoryUsageSequenceGraphics(MEMORY_array, i, sample);
+            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
+        }
+        if (!system_chose && !user_chose && graph_chose) { // if no flag indicated except graphics
+            MEMORY_array[i] = generateMemoryUsageSequenceGraphics(MEMORY_array, i, sample);
+            getUserUsage();
+            printf("----------------------------------------------------\n");
+            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
         }
 
 
