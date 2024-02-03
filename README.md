@@ -68,18 +68,31 @@ To ensure that the output is refreshed at every time point, before taking each s
 | `void printMemoryUsage()` | Print the relevant **stat** about Memory Usage in specific format. |
 | `MEMORY_OCCUPY *generateMemoryUsage(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | Return the `MEMORY_OCCUPY` type which contains all stat in new time point and print the `total memory usage` in specific format. |
 | `MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | Return the `MEMORY_OCCUPY` type which contains all stat in new time point and print the `total memory usage` in specific format under the command `--sequential` |
-| `CPU_OCCUPY *generateCPUUsage(CPU_OCCUPY **CPU_array, int i)` | Return the `CPU_OCCUPY` type which contains all stat in new time point and print the `CPU usage` in specific format. |
+| `CPU_OCCUPY *generateCPUUsage(CPU_OCCUPY **CPU_array, int i)` | Return the `CPU_OCCUPY` type which contains all stat in new time point and print the `CPU usage` in specific format **tip: because the first time only has one information, the CPU usage is meaningless!** |
 | `bool changeArgument(int argc, char**argv, int *sample, int *interval, bool *system_chose, bool *graph_chose, bool *user_chose, bool *sequential_chose` | Parses through command line arguments to determine which flags have been entered. Returns true iff arguments are entered in correct format. `argc` is the number of command line arguments entered and `argv` is an array of strings that holds the command line arguments entered. `sample` points to the number times statistics will be collected and `interval` points to the frequency of statistic collection. `system_chose`, `user_chose` and `graphics_chose` each point to a boolean variables that holds true iff the `system` chose, `user` chose, `graphics` chose, `sequential_chose` are inputted by the user, respectively. |
 | `void getUserUsage()` | Print some relevant stat about user usage. |
 | `void getUptime()` | Calculate the uptime parameter and print it to the screen in specific format. |
 | `void printSystemInfo()` | Print all stat about the system information. |
 | `void printSystemStats(int sample, int inerval, bool system_chose, bool graph_chose, bool user_chose, bool sequential_chose)` | Prints final output. `sample` is the number times statistics will be collected and `interval` is the frequency of statistic collection.`system_chose`, `user_chose`, `graph_chose` and `sequential_chose` hold true iff the `system` chose, `user` chose, `graphics` and 'sequential` chose are inputted by the user, respectively. |
 | `void printSystemStatsSequence(int sample, int inerval, bool system_chose, bool graph_chose, bool user_chose, bool sequential_chose)` | Prints final output. `sample` is the number times statistics will be collected and `interval` is the frequency of statistic collection.`system_chose`, `user_chose`, `graph_chose` and `sequential_chose` hold true iff the `system` chose, `user` chose, `graphics` and 'sequential` chose are inputted by the user, respectively. |
+| `MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | Displays memory usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `MEMORY_array` represents all memory information in this reading |
+| `MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | this is as same as `MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` but under "--sequential" condition |
+| `CPU_OCCUPY *generateCPUUsageGraphics(CPU_OCCUPY **CPU_array, int i)` | Displays CPU usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `CPU_array` represents all memory information in this reading |
+
 
 
 ### Running the Program
-
-
+     1. Navigate to the directory (i.e., `cd`) in which `MySystemStats.c` is saved on your machine.
+     2. In the terminal, enter `gcc -Wall -Werror mySystemStats.c -o MySystemStats` to compile the program.
+     3. To execute the program, enter `./MySystemStats` into the terminal. You may also use the following flags when executing:
+      | **Flag**                | **Description**                                                                                                 |
+      | ----------------------- | --------------------------------------------------------------------------------------------------------------- |
+      | `--system` | to indicate that only the system usage should be generated |
+      | `--user` | to indicate that only the users usage should be generated |
+      | `--graphics` or `--g` |  to include graphical output in the cases where a graphical outcome is possible as indicated below |
+      | `--sequential` | to indicate that the information will be output sequentially without needing to "refresh" the screen (useful if you would like to redirect the output into a file) |
+      | `--samples=N` | if used the value N will indicate how many times the statistics are going to be collected and results will be average and reported based on the N number of repetitions.**If not value is indicated the default value will be 10** |
+      | `--tdelay=T` |  to indicate how frequently to sample in seconds. **If not value is indicated the default value will be 1 sec** |
 
 
 
