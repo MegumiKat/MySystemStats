@@ -82,17 +82,92 @@ To ensure that the output is refreshed at every time point, before taking each s
 
 
 ### Running the Program
-     1. Navigate to the directory (i.e., `cd`) in which `MySystemStats.c` is saved on your machine.
-     2. In the terminal, enter `gcc -Wall -Werror mySystemStats.c -o MySystemStats` to compile the program.
-     3. To execute the program, enter `./MySystemStats` into the terminal. You may also use the following flags when executing:
-      | **Flag**                | **Description**                                                                                                 |
-      | ----------------------- | --------------------------------------------------------------------------------------------------------------- |
-      | `--system` | to indicate that only the system usage should be generated |
-      | `--user` | to indicate that only the users usage should be generated |
-      | `--graphics` or `--g` |  to include graphical output in the cases where a graphical outcome is possible as indicated below |
-      | `--sequential` | to indicate that the information will be output sequentially without needing to "refresh" the screen (useful if you would like to redirect the output into a file) |
-      | `--samples=N` | if used the value N will indicate how many times the statistics are going to be collected and results will be average and reported based on the N number of repetitions.**If not value is indicated the default value will be 10** |
-      | `--tdelay=T` |  to indicate how frequently to sample in seconds. **If not value is indicated the default value will be 1 sec** |
+1. Navigate to the directory (i.e., `cd`) in which `MySystemStats.c` is saved on your machine.
+2. In the terminal, enter `gcc -Wall -Werror mySystemStats.c -o MySystemStats` to compile the program.
+3. To execute the program, enter `./MySystemStats` into the terminal. You may also use the following flags when executing:
+     
+| **Flag**                | **Description** |
+| --- | --- |
+| `--system` | to indicate that only the system usage should be generated |
+| `--user` | to indicate that only the users usage should be generated |
+| `--graphics` or `--g` |  to include graphical output in the cases where a graphical outcome is possible as indicated below |
+| `--sequential` | to indicate that the information will be output sequentially without needing to "refresh" the screen (useful if you would like to redirect the output into a file) |
+| `--samples=N` | if used the value N will indicate how many times the statistics are going to be collected and results will be average and reported based on the N number of repetitions.**If not value is indicated the default value will be 10** |
+| `--tdelay=T` |  to indicate how frequently to sample in seconds. **If not value is indicated the default value will be 1 sec** |
+| `samples tdelay` | The last two arguments can also be considered as positional arguments if not flag is indicated in the corresponding order |
+
+- For example, `./MySystemStats --system --g --samples=5 --tdelay=2` will print the system usage report with graphics and will collect statistics every 2 seconds for a total and of 5 time points.
+- The number of samples and frequency can also be inputted as positional arguments (i.e., as two adjacent numbers separated by a space, where the first number is the number of samples and the second number is the frequency).
+     - These positional arguments can be located anywhere along the input as long as the two numbers are adjacent (e.g., `./MySystemStats 5 --system 2` is invalid).
+     - For example, `./MySystemStats --user 5 2`  and `./MySystemStats 5 2 --system` will both print the system information report and will collect statistics every 2 seconds for a total of 5 time points.
+     - `./MySystemStats` is equivalent to `./mySystemStats --system --user --samples=10 --tdelay=1`.
+4. If `Invalid argument entered!` is printed on the screen after executing, refer back to flags outline in _Step 3_ and repeat the above steps.
+
+
+### Understanding Graphics
+This section applies if the user inputs the graphics flag (i.e., `--graphics` or `--g`).
+
+**Memory Usage Graphics**: The graphics are a display of `delta_memory_usage`, the relative change in physical memory usage between the previous and current samples. If `delta_memory_usage` is negative, there is a : symbol for every change of 0.01 with a @ at the end. If deltaMemoryUsage is positive, there is a # symbol for every change of 0.01 with a * at the end. If deltaMemoryUsage is 0.00, a o is printed. Beside this graphic is an expression of the form `delta_memory_usage` , where totalMemoryUsed is expressed in GB.
+
+**CPU Usage Graphics:**
+If the CPU usage is 0%, the `|||` symbol is printed. If the CPU usage is positive, a `|` is printed for every percent of usage (rounded up to the nearest percent). 
+
+
+_Sample Graphics_
+```
+Nbr of samples: 10 -- every 1 secs
+ Memory usage: 4052 kilobytes
+---------------------------------------
+### Memory ### (Phys.Used/Tot -- Virtual Used/Tot) 
+9.75 GB / 15.37 GB  -- 9.75 GB / 16.33 GB   |o 0.00 (9.75) 
+9.75 GB / 15.37 GB  -- 9.75 GB / 16.33 GB   |* 0.00 (9.75) 
+9.75 GB / 15.37 GB  -- 9.75 GB / 16.33 GB   |* 0.00 (9.75) 
+9.76 GB / 15.37 GB  -- 9.76 GB / 16.33 GB   |* 0.00 (9.76) 
+9.85 GB / 15.37 GB  -- 9.85 GB / 16.33 GB   |#########* 0.09 (9.85) 
+10.06 GB / 15.37 GB  -- 10.06 GB / 16.33 GB   |####################* 0.20 (10.06) 
+10.13 GB / 15.37 GB  -- 10.13 GB / 16.33 GB   |#######* 0.07 (10.13) 
+10.16 GB / 15.37 GB  -- 10.16 GB / 16.33 GB   |##* 0.03 (10.16) 
+10.28 GB / 15.37 GB  -- 10.28 GB / 16.33 GB   |###########* 0.12 (10.28) 
+10.38 GB / 15.37 GB  -- 10.38 GB / 16.33 GB   |##########* 0.11 (10.38) 
+---------------------------------------
+### Sessions/users ### 
+ marcelo       pts/0 (138.51.12.217)
+ marcelo       pts/1 (tmux(277015).%0)
+ alberto        tty7 (:0)
+ marcelo       pts/2 (tmux(277015).%1)
+ marcelo       pts/5 (138.51.12.217)
+---------------------------------------
+Number of cores: 4 
+ total cpu use = 15.57%
+         ||| 0.25 
+         ||||||||| 6.93 
+         ||||||||||||||| 12.08 
+         |||||||||||||||| 13.83 
+         ||||||||| 6.41 
+         |||||||||||||||| 13.97 
+         |||||||||||||||||| 15.37 
+         ||||||||||||||||| 14.91 
+         ||||||||||||||||||| 16.34 
+         |||||||||||||||||| 15.57 
+---------------------------------------
+### System Information ### 
+ System Name = Linux
+ Machine Name = iits-b473-01
+ Version = #99-Ubuntu SMP Thu Sep 23 17:29:00 UTC 2021
+ Release = 5.4.0-88-generic
+ Architecture = x86_64
+ System running since last reboot: 3 days 19:27:30 (91:27:30)
+---------------------------------------
+
+```
+
+
+ 
+**Potential Technical Difficulties:**
+If there are too many information output in terminal, the formatting for the graphics may not be as desired. If this occurs, kindly using the terminal command `clear` and rerun the program.
+ 
+ 
+
 
 
 
