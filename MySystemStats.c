@@ -131,6 +131,8 @@ MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, 
     for(int j = 0; j < i; j++){//print all elements in the MEMORY_array
         printf("%s\n",MEMORY_array[j]->str);
     }
+    float delta_memory_usage = 0;
+    char relevant_stat[80];
 
     strcat(memory->str, "        | ");
     if(i == 0){
@@ -139,12 +141,13 @@ MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, 
         float last_phys = MEMORY_array[i -1]->phys_mem_used;
         float curr_phys = memory->phys_mem_used;
 
-        float delta_memory_usage = curr_phys - last_phys;
+        delta_memory_usage = curr_phys - last_phys;
         char relevant_stat[80];
 
         // zero+
         if (delta_memory_usage == 0) {
             strcat(memory->str, "o ");
+            delta_memory_usage = 0;
         }
         // positive change in memory usage
         else if (delta_memory_usage > 0) {
@@ -160,9 +163,10 @@ MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, 
             }
             strcat(memory->str, "@ ");
         }
-        sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
-        strcat(memory->str, relevant_stat);
+        
     }
+    sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
+    strcat(memory->str, relevant_stat);
 
     printf("%s\n", memory->str);//print the data read in this time
 
@@ -217,16 +221,19 @@ MEMORY_OCCUPY *generateMemoryUsageSequenceGraphics(MEMORY_OCCUPY **MEMORY_array,
         strcpy(MEMORY_array[j]->str, "\n");
         printf("%s\n",MEMORY_array[j]->str);
     }
+    float delta_memory_usage;
+    char relevant_stat[80];
 
     strcat(memory->str, "        | ");
     if(i == 0){
         strcat(memory->str, "o ");
+        delta_memory_usage = 0;
     }else{
         float last_phys = MEMORY_array[i -1]->phys_mem_used;
         float curr_phys = memory->phys_mem_used;
 
-        float delta_memory_usage = curr_phys - last_phys;
-        char relevant_stat[80];
+        delta_memory_usage = curr_phys - last_phys;
+        
 
         // zero+
         if (delta_memory_usage == 0) {
@@ -246,9 +253,10 @@ MEMORY_OCCUPY *generateMemoryUsageSequenceGraphics(MEMORY_OCCUPY **MEMORY_array,
             }
             strcat(memory->str, "@ ");
         }
-        sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
-        strcat(memory->str, relevant_stat);
+        
     }
+    sprintf(relevant_stat, "%.2f (%.2f)", delta_memory_usage, memory->phys_mem_used);
+    strcat(memory->str, relevant_stat);
 
     printf("%s\n", memory->str);
     for (int j = 0; j < sample - i - 1; j++){
