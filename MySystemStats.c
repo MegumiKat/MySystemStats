@@ -151,14 +151,15 @@ MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, 
         }
         // positive change in memory usage
         else if (delta_memory_usage > 0) {
-            for (float i = 0; i < delta_memory_usage; i += 0.0105) {
+            for (float i = 0; i < (delta_memory_usage * 100); i++) {
                 strcat(memory->str, "#");
             }
             strcat(memory->str, "* ");
         }
         // negative change in memory usage
         else if (delta_memory_usage < 0) {
-            for (float i = 0; i < delta_memory_usage; i += 0.0105) {
+            float pos_delta = - delta_memory_usage;
+            for (float i = 0; i < pos_delta * 100; i ++) {
                 strcat(memory->str, ":");
             }
             strcat(memory->str, "@ ");
@@ -241,14 +242,15 @@ MEMORY_OCCUPY *generateMemoryUsageSequenceGraphics(MEMORY_OCCUPY **MEMORY_array,
         }
         // positive change in memory usage
         else if (delta_memory_usage > 0) {
-            for (float i = 0; i < delta_memory_usage; i += 0.010001) {
+            for (float i = 0; i < (delta_memory_usage * 100); i ++) {
                 strcat(memory->str, "#");
             }
             strcat(memory->str, "* ");
         }
         // negative change in memory usage
         else if (delta_memory_usage < 0) {
-            for (float i = 0; i < delta_memory_usage; i += 0.010001) {
+            float pos_delta = - delta_memory_usage;
+            for (float i = 0; i < (pos_delta * 100); i ++) {
                 strcat(memory->str, ":");
             }
             strcat(memory->str, "@ ");
@@ -333,7 +335,7 @@ bool changeArgument(int argc, char**argv, int *sample, int *interval, bool *syst
                 *system_chose = true;
             }else if (strcmp(flag, "--user") == 0){
                 *user_chose = true;
-            }else if (strcmp(flag, "--graphics") == 0 || strcmp(flag, "--g") == 0 ){
+            }else if (strcmp(flag, "--graphics") == 0 || strcmp(flag, "-g") == 0 ){
                 *graph_chose = true;
             }else if (strcmp(flag, "--sequential") == 0){
                 *sequential_chose = true;
