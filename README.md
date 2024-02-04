@@ -78,6 +78,7 @@ To ensure that the output is refreshed at every time point, before taking each s
 | `MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | Displays memory usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `MEMORY_array` represents all memory information in this reading |
 | `MEMORY_OCCUPY *generateMemoryUsageSequence(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` | this is as same as `MEMORY_OCCUPY *generateMemoryUsageGraphics(MEMORY_OCCUPY **MEMORY_array, int i, int sample)` but under "--sequential" condition |
 | `CPU_OCCUPY *generateCPUUsageGraphics(CPU_OCCUPY **CPU_array, int i)` | Displays CPU usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `CPU_array` represents all memory information in this reading |
+| `CPU_OCCUPY *generateCPUUsageGraphicsSequence(CPU_OCCUPY **CPU_array, int i, int sample)` | Displays CPU usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `CPU_array` represents all memory information in this reading under `--sequential` |
 
 
 
