@@ -291,6 +291,33 @@ CPU_OCCUPY *generateCPUUsageGraphics(CPU_OCCUPY **CPU_array, int i){
     return cpu;
 }
 
+/*Generating the CPU usage with graphics */
+CPU_OCCUPY *generateCPUUsageGraphicsSequence(CPU_OCCUPY **CPU_array, int i, int sample){
+    printf("Number of cores: %ld\n", sysconf(_SC_NPROCESSORS_ONLN)); // get the number of core
+    CPU_OCCUPY *cpu = malloc(sizeof(CPU_OCCUPY)); //creat a new CPU data type
+    cpu = newCpu();
+    float cpu_usage = calculateCPUUsage(CPU_array[i], cpu);//get the cpu usage value
+    printf(" total cpu use = %.2f%%\n", cpu_usage); // display CPU usage
+    strcat(cpu->str, "          |||");
+    char relevant[80];
+    for(int i = 0; i < cpu_usage; i++){
+        strcat(cpu->str,"|");
+    }
+    sprintf(relevant, " %.2f", cpu_usage);
+    strcat(cpu->str, relevant);
+    for(int j = 1; j < (i + 1); j++){
+        strcpy(CPU_array[j]->str, "\n");
+        printf("%s\n", CPU_array[j]->str);   
+    }
+    printf("%s\n", cpu->str);
+    for (int j = 0; j < sample - i - 1; j++){
+        printf("\n");
+    }
+    
+
+    return cpu;
+}
+
 /*Generating the CPU usage */
 CPU_OCCUPY *generateCPUUsage(CPU_OCCUPY **CPU_array, int i){
     printf("Number of cores: %ld\n", sysconf(_SC_NPROCESSORS_ONLN)); // get the number of core
@@ -529,13 +556,13 @@ void printSystemStatsSequence(int sample, int inerval, bool system_chose, bool g
         }
         if (system_chose && graph_chose) { // if system and graphics flag indicated
             MEMORY_array[i] = generateMemoryUsageSequenceGraphics(MEMORY_array, i, sample);
-            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
+            CPU_array[i+1] = generateCPUUsageGraphicsSequence(CPU_array, i, sample);
         }
         if (!system_chose && !user_chose && graph_chose) { // if no flag indicated except graphics
             MEMORY_array[i] = generateMemoryUsageSequenceGraphics(MEMORY_array, i, sample);
             getUserUsage();
             printf("----------------------------------------------------\n");
-            CPU_array[i+1] = generateCPUUsageGraphics(CPU_array, i);
+            CPU_array[i+1] = generateCPUUsageGraphicsSequence(CPU_array, i, sample);
         }
 
 
