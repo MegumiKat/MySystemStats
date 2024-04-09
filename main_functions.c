@@ -235,6 +235,7 @@ void printSystemStats(COMMAND *command)
         {
             exit(EXIT_SUCCESS);
         }
+        printf("\x1b[s"); 
         printMemoryTitle(i, command);
         if (command->sys_flag || command->gra_flag || command->pos_flag || command->seq_flag)
         {
@@ -256,6 +257,11 @@ void printSystemStats(COMMAND *command)
             printf("%s", USER_arr);
         }
         sleep(command->t_delay);
+        if (i+1 < samples) { 
+             //the interval to read relavant data
+            printf("\x1b[u");//back to the position
+        }
+        
     }
     printSystemInfo();
 }
