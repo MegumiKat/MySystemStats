@@ -68,19 +68,19 @@ void printSystemInfo()
 //   - CPU_str: String to store formatted CPU usage information.
 void generateCPUUsage(int i, double *cpu, double *TIME_pre, double *UT_pre, COMMAND *command, char CPU_arr_3[][1024], char CPU_arr_4[][1024], char CPU_str[1024])
 {
-    FILE *fp;
-    long int user, nice, system, i2, iowait, irq, softirq;
-    fp = fopen("/proc/stat", "r");
-    if (fp != NULL)
+    FILE *stat;
+    long int user, nice, system, idle, iowait, irq, softirq;
+    stat = fopen("/proc/stat", "r");
+    if (stat != NULL)
     {
-        fscanf(fp, "cpu %ld %ld %ld %ld %ld %ld %ld", &user, &nice, &system, &i2, &iowait, &irq, &softirq);
+        fscanf(stat, "cpu %ld %ld %ld %ld %ld %ld %ld", &user, &nice, &system, &idle, &iowait, &irq, &softirq);
 
-        fclose(fp);
+        fclose(stat);
     }
-    double total = user + nice + system + iowait + irq + softirq + i2;
-    double Ut = total - i2;
-    *cpu = fabs(((double)(Ut - *UT_pre) / (total - *TIME_pre)) * 100);
-    *UT_pre = Ut;
+    double total = user + nice + system + idle + iowait + irq + softirq;
+    double UT_curr = total - idle;
+    *cpu = fabs(((double)(UT_curr - *UT_pre) / (total - *TIME_pre)) * 100);
+    *UT_pre = UT_curr;
     *TIME_pre = total;
 
     if (i == 0)
