@@ -15,11 +15,14 @@
 #include <pwd.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
+#include <math.h>
 #include <sys/utsname.h>
 
-typedef struct COMMAND_PACKAGE{
+typedef struct COMMAND_PACKAGE
+{
     int samples;
-    int tdelay;
+    int t_delay;
     int pos_num;
     int flag_num;
     bool pos_flag;
@@ -27,35 +30,38 @@ typedef struct COMMAND_PACKAGE{
     bool seq_flag;
     bool use_flag;
     bool gra_flag;
-}COMMAND;
+} COMMAND;
 
-typedef struct CPU_PACKAGE{
+typedef struct CPU_PACKAGE
+{
     double CPU_cur;
     double TIME_pre;
     double UT_pre;
-            
+    int samples;
+
     char CPU_str[1024];
     char CPU_arr_2[1024];
     char CPU_arr_1[1024];
-}CPU_OCCUPY;
+} CPU_OCCUPY;
 
-typedef struct MEMORY_PACKAGE{
+typedef struct MEMORY_PACKAGE
+{
     double VIR_pre;
-    char memory_store[1024]; 
-}MEMORY_OCCUPY; 
+    char memory_store[1024];
+} MEMORY_OCCUPY;
 
-COMMAND* package(int sample, int tdelay);
-void changeFlags(int argc, char**argv, COMMAND* command);
-void Pressed_ctr_c(int signal);
-void generateCPUUsage(int i, double *cpu, double *t1, double *c1, COMMAND*command, char arrForCpu[][1024], char arrForStorCpu[][1024], char storeCPUs[1024]);
-void printMemoryStats(COMMAND* command, int i, double *preVirMem, char arr[1024]);
-void printTitle(int i,  COMMAND* command);
-void printMemorySession(int i, COMMAND*command, char memoryArray[][1024]);
+COMMAND *package(int sample, int t_delay);
+void changeArgument(int argc, char **argv, COMMAND *command);
+void Pressed_ctr_c();
+void generateCPUUsage(int i, double *cpu, double *TIME_pre, double *UT_pre, COMMAND *command, char CPU_arr_3[][1024], char CPU_arr_4[][1024], char CPU_str[1024]);
+void printMemoryStats(COMMAND *command, int i, double *preVirMem, char arr[1024]);
+void printMemoryTitle(int i, COMMAND *command);
+void printMemoryInfo(int i, COMMAND *command, char memory_arr[][1024]);
 void printCores();
-void printCPUUsage(int i, bool graph, double cpu, int samples, int tdelay, char arrForCpu[][1024], char arrForStorCpu[][1024]);
 void getUserUsage(char USER_arr[1024]);
 bool isInt(char *string);
-void printSystemStats(int argc, char** argv, COMMAND* command);
-void printSysOnly();
+void printSystemStats(COMMAND *command);
 void getUptime();
 void printSystemInfo();
+void printCPUInfo(int i, COMMAND *command, char CPU_arr_0[][1024]);
+void printUserTitle();

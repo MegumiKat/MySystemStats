@@ -1,6 +1,7 @@
 # MySystemStats
-CSCB09 A1
+CSCB09 A1 && A3
 ### APPROACH
+Because in A1 and A3, there are the same information gathering but different with the calculating. Thus, I use the information gather part from Part I. However, i add how to compile A3, and what difficulties in the below.
 #### Step 1 : Gather the information:
 Reading through the documentation for the auxiliray C libraries listed in the assignment handout, I determined which functions I can use to gather all the required **stat** (_running parameters, user usage, system usage, system informtaion_).
 ###### SYSTEM INFORMATION:
@@ -59,6 +60,7 @@ To ensure that the output is refreshed at every time point, before taking each s
 
 
 ### Methods Overview
+##### Part I: 
 | **Function** | **Description** | 
 | --- | --- |
 | `MEMORY_OCCUPY* newMemory()` | Creats a new Memory Node containd all relevant **stat** which record the data in different time points. |
@@ -80,12 +82,29 @@ To ensure that the output is refreshed at every time point, before taking each s
 | `CPU_OCCUPY *generateCPUUsageGraphics(CPU_OCCUPY **CPU_array, int i)` | Displays CPU usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `CPU_array` represents all memory information in this reading |
 | `CPU_OCCUPY *generateCPUUsageGraphicsSequence(CPU_OCCUPY **CPU_array, int i, int sample)` | Displays CPU usage with graphics. `sample` is the number times statistics will be collected, `i` indicates the number times statistics will have been collected by the end of the current cycle, `CPU_array` represents all memory information in this reading under `--sequential` |
 
+##### Part II:
+| **Function** | **Description** | 
+| --- | --- |
+| `COMMAND *package(int sample, int t_delay)` | Creates and initializes a COMMAND structure and returns a pointer to it. |
+| `void changeArgument(int argc, char **argv, COMMAND *command)` | Parses command-line arguments and updates command structure flags accordingly. |
+| `void Pressed_ctr_c()` | Signal handler for SIGINT (Ctrl+C) signal.Prompts the user to confirm program termination. |
+| `void generateCPUUsage(int i, double *cpu, double *TIME_pre, double *UT_pre, COMMAND *command, char CPU_arr_3[][1024], char CPU_arr_4[][1024], char CPU_str[1024])` | Reads CPU usage information from /proc/stat, calculates CPU usage percentage,and generates formatted strings for CPU usage data. |
+| `void printMemoryStats(COMMAND *command, int i, double *preVirMem, char arr[1024])` | Retrieves memory usage statistics using sysinfo() and formats the data. |
+| `void printMemoryInfo(int i, COMMAND *command, char memory_arr[][1024])` | Prints memory usage information. |
+| `void printCores()` | Prints the number of CPU cores. |
+| `void getUserUsage(char USER_arr[1024])` | Retrieves user session information and formats the data. |
+| `bool isInt(char *string)` | Checks if a string represents an integer. |
+| `void printSystemStats(COMMAND *command)` | Prints system statistics based on command flags and arguments. |
+| `void getUptime()` | Reads system uptime information from /proc/uptime and prints it. |
+| `void printSystemInfo()` |  Prints system information such as system name, machine name, version, release, architecture, and uptime. |
+| `void printCPUInfo(int i, COMMAND *command, char CPU_arr_0[][1024])` |  Prints CPU usage information. |
+| `void printUserTitle()` |  Prints a title for user session information. |
 
 
 ### Running the Program
 1. Navigate to the directory (i.e., `cd`) in which `MySystemStats.c` is saved on your machine.
-2. In the terminal, enter `gcc -Wall -Werror mySystemStats.c -o MySystemStats` to compile the program.
-3. To execute the program, enter `./MySystemStats` into the terminal. You may also use the following flags when executing:
+2. In the terminal, enter `gcc -Wall -Werror mySystemStats.c -o MySystemStats` to compile the Part I and enter `make` to compile Part II, which is the concurrency program.
+3. To execute the program, enter `./MySystemStats` for Part I and `./a3` for Part II into the terminal. You may also use the following flags when executing:
      
 | **Flag**                | **Description** |
 | --- | --- |
@@ -94,14 +113,15 @@ To ensure that the output is refreshed at every time point, before taking each s
 | `--graphics` or `-g` |  to include graphical output in the cases where a graphical outcome is possible as indicated below |
 | `--sequential` | to indicate that the information will be output sequentially without needing to "refresh" the screen (useful if you would like to redirect the output into a file) |
 | `--samples=N` | if used the value N will indicate how many times the statistics are going to be collected and results will be average and reported based on the N number of repetitions.**If not value is indicated the default value will be 10** |
-| `--tdelay=T` |  to indicate how frequently to sample in seconds. **If not value is indicated the default value will be 1 sec** |
-| `samples tdelay` | The last two arguments can also be considered as positional arguments if not flag is indicated in the corresponding order |
+| `--t_delay=T` |  to indicate how frequently to sample in seconds. **If not value is indicated the default value will be 1 sec** |
+| `samples t_delay` | The last two arguments can also be considered as positional arguments if not flag is indicated in the corresponding order |
 
-- For example, `./MySystemStats --system --g --samples=5 --tdelay=2` will print the system usage report with graphics and will collect statistics every 2 seconds for a total and of 5 time points.
+- For example, `./MySystemStats --system --g --samples=5 --t_delay=2` will print the system usage report with graphics and will collect statistics every 2 seconds for a total and of 5 time points.
 - The number of samples and frequency can also be inputted as positional arguments (i.e., as two adjacent numbers separated by a space, where the first number is the number of samples and the second number is the frequency).
      - These positional arguments can be located anywhere along the input as long as the two numbers are adjacent (e.g., `./MySystemStats 5 --system 2` is invalid).
      - For example, `./MySystemStats --user 5 2`  and `./MySystemStats 5 2 --system` will both print the system information report and will collect statistics every 2 seconds for a total of 5 time points.
-     - `./MySystemStats` is equivalent to `./mySystemStats --system --user --samples=10 --tdelay=1`.
+     - For Part II, you also can individually type the number. The program will automatically recognize the first one is sample and second one is tdelay.
+     - `./MySystemStats` is equivalent to `./mySystemStats --system --user --samples=10 --t_delay=1`.
 4. If `Invalid argument entered!` is printed on the screen after executing, refer back to flags outline in _Step 3_ and repeat the above steps.
 
 
@@ -111,10 +131,11 @@ This section applies if the user inputs the graphics flag (i.e., `--graphics` or
 **Memory Usage Graphics**: The graphics are a display of `delta_memory_usage`, the relative change in physical memory usage between the previous and current samples. If `delta_memory_usage` is negative, there is a : symbol for every change of 0.01 with a @ at the end. If deltaMemoryUsage is positive, there is a # symbol for every change of 0.01 with a * at the end. If deltaMemoryUsage is 0.00, a o is printed. Beside this graphic is an expression of the form `delta_memory_usage` , where totalMemoryUsed is expressed in GB.
 
 **CPU Usage Graphics:**
-If the CPU usage is 0%, the `|||` symbol is printed. If the CPU usage is positive, a `|` is printed for every percent of usage (rounded up to the nearest percent). 
+- If the CPU usage is 0%, the `|||` symbol is printed. If the CPU usage is positive, a `|` is printed for every percent of usage (rounded up to the nearest percent). 
+- For part II, there will be nothing is the usage is 0%.
 
 
-_Sample Graphics_
+**_Sample Graphics_**: it is the approximately graph, the output is some different with it.
 ```
 Nbr of samples: 10 -- every 1 secs
  Memory usage: 4052 kilobytes
@@ -165,8 +186,16 @@ Number of cores: 4
 
  
 **Potential Technical Difficulties:**
-If there are too many information output in terminal, the formatting for the graphics may not be as desired. If this occurs, kindly using the terminal command `clear` and rerun the program.
- 
+- If there are too many information output in terminal, the formatting for the graphics may not be as desired. If this occurs, kindly using the terminal command `clear` and rerun the program.
+
+- Part II need us to calculate the CPU usage concurrently. So, in this part, the program need to use the `pipe` and `fork` to creat the child process for each part, such as `memory`, `cpu` and `user`. Thus, that is why there is a `stat_func_child[3]`.
+
+- By using the `pipe` to change the program, it need to pipe the value between each so it leads to change many original function with the Part I. In Part I, I have use many stat_function dirctly print the information. However, in Part II, i change the orginal fucntion and revise them to revise the string Array to store the message. In the simple words, i separate the `print part` and `handle information part`.
+
+- In this assignment, it has a requirment about the "We will compare the total runtime of your program using the time command, and it should not exceed for more than 1% the one given by `tdelay` * `samples`". This is very difficult to do. The biggest part I change is the code in the `printSystemStats` last part to print the each information, i have tried the origin part in Part I but it cost approximately one more times(like 10 sample 1 tdelay using the 20s).
+
+- Another part is when i calculate the cpu usage. i read each stats by `stroken` which is as same as Part I but is cost more time like 0.3s or 0.4s and sometimes cause segment fault. I still don't know the reason.
+
  
 
 
