@@ -68,24 +68,24 @@ void printSystemInfo()
 //   - CPU_str: String to store formatted CPU usage information.
 void generateCPUUsage(int i, double *cpu, double *TIME_pre, double *UT_pre, COMMAND *command, char CPU_arr_3[][1024], char CPU_arr_4[][1024], char CPU_str[1024])
 {
-    FILE *stat;
-    long int user, nice, system, idle, iowait, irq, softirq;
-    stat = fopen("/proc/stat", "r");
-    if (stat != NULL)
+    FILE *fp;
+    long int user, nice, system, i2, iowait, irq, softirq;
+    fp = fopen("/proc/stat", "r");
+    if (fp != NULL)
     {
-        fscanf(stat, "cpu %ld %ld %ld %ld %ld %ld %ld", &user, &nice, &system, &idle, &iowait, &irq, &softirq);
+        fscanf(fp, "cpu %ld %ld %ld %ld %ld %ld %ld", &user, &nice, &system, &i2, &iowait, &irq, &softirq);
 
-        fclose(stat);
+        fclose(fp);
     }
-    double total = user + nice + system + idle + iowait + irq + softirq;
-    double UT_curr = total - idle;
-    *cpu = fabs(((double)(UT_curr - *UT_pre) / (total - *TIME_pre)) * 100);
-    *UT_pre = UT_curr;
+    double total = user + nice + system + iowait + irq + softirq + i2;
+    double Ut = total - i2;
+    *cpu = fabs(((double)(Ut - *UT_pre) / (total - *TIME_pre)) * 100);
+    *UT_pre = Ut;
     *TIME_pre = total;
 
     if (i == 0)
     {
-        sprintf(CPU_str, "total cpu use:%f%c\n", 0.00, '%');
+        sprintf(CPU_str, "total cpu use:%.2f%c\n", 0.00, '%');
         if (command->gra_flag)
         {
             strcpy(CPU_arr_4[0], "@0.00");
@@ -205,10 +205,6 @@ void printMemoryStats(COMMAND *command, int i, double *pre, char arr[1024])
 void printMemoryTitle(int i, COMMAND *command)
 {
     struct rusage ump;
-    if (!command->seq_flag)
-    {
-        system("clear");
-    }
 
     if (command->seq_flag)
     {
