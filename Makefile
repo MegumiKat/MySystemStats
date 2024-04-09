@@ -1,15 +1,29 @@
+# Compiler
 CC = gcc
-CFLAGS = -Wall
-HEADER = header.h
 
-all: a3
+# Compiler flags
+CFLAGS = -Wall -Wextra -g
 
-a3: main_functions.o stats_functions.o
-	$(CC) $(CFLAGS) -o $@ $^	
+# Source files
+SRCS = main_functions.c stats_functions.c
 
-.%o : %.c $(HEADER)
-	$(CC) $(CFLAGS) -c $<
+# Header files
+HDRS = header.h
 
-.PHONY: clean
+# Object files
+OBJS = $(SRCS:.c=.o)
+
+# Executable
+TARGET = a3
+
+# Rule to build executable from object files
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+# Rule to compile source files into object files
+%.o: %.c $(HDRS)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+# Phony target to clean compiled files
 clean:
-	rm *.o
+	rm -f $(OBJS) $(TARGET)
